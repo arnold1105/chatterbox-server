@@ -29,7 +29,7 @@ var defaultCorsHeaders = {
   'access-control-max-age': 10 // Seconds.
 };
 
-var results = {
+var dataBAse = {
   results: []
 };
 var requestHandler = function(request, response) {
@@ -38,59 +38,86 @@ var requestHandler = function(request, response) {
   //Notes:
 
   // if this is a Get request 
-  if (request.method === 'GET') {
-    if (request.url === '/classes/messages') {
+  if (request.method === 'GET') { //for Get request
+    if (request.url === '/classes/messages') { //for Get request
       // if it is succesful request 
       // return a 200 
+      console.log('Serving request type ' + request.method + ' for url ' + request.url);
+      var statusCode = 200;
+      var headers = defaultCorsHeaders;
+      headers['Content-Type'] = 'application/javascript';
+      
+      response.writeHead(statusCode, headers);
+
+      response.end(JSON.stringify(dataBAse));
+      
     } else {
+      var statusCode = 404;
+      var headers = defaultCorsHeaders;
+      headers['Content-Type'] = 'application/javascript';
+      
+      response.writeHead(statusCode, headers);
+
+      response.end('error');
       //else (bad request)
       //return a 404
     }  
+  } else if (request.method === 'POST') { // for post requests
+    if (request.url === '/classes/messages') {
+      var postCode = 201;
+      console.log('Serving request type ' + request.method + ' for url ' + request.url);
+      
+      var headers = defaultCorsHeaders;
+      headers['Content-Type'] = 'application/javascript';
+      let body = [];
+      request.on('data', (chunk) => {
+        // let body = [];
+        body.push(chunk); 
+        // body = Buffer.concat(body).toString();
+        console.log('Message saved to Database', JSON.stringify(dataBAse));     
+      }).on('end', () => {
+        body = Buffer.concat(body).toString();
+        dataBAse.results.push(JSON.parse(body));
+        console.log('good job');
+      });
+
+
+      response.writeHead(postCode, headers);
+      response.end('Message saved to Database');
+
+
+    } else {
+      var statusCode = 404;
+      var headers = defaultCorsHeaders;
+      headers['Content-Type'] = 'application/javascript';
+      
+      response.writeHead(statusCode, headers);
+
+      response.end('error');
+    }
+    
   }
   // else (Post)
   // add message to result
 
 
-  // Request and Response come from node's http module.
-  //
-  // They include information about both the incoming request, such as
-  // headers and URL, and about the outgoing response, such as its status
-  // and content.
-  //
-  // Documentation for both request and response can be found in the HTTP section at
-  // http://nodejs.org/documentation/api/
+  // console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
-  // Do some basic logging.
-  //
-  // Adding more logging to your server can be an easy way to get passive
-  // debugging help, but you should always be careful about leaving stray
-  // console.logs in your code.
-  console.log('Serving request type ' + request.method + ' for url ' + request.url);
+  // // The outgoing status.
+  // var statusCode = 200;
 
-  // The outgoing status.
-  var statusCode = 200;
+  // // See the note below about CORS headers.
+  // var headers = defaultCorsHeaders;
 
-  // See the note below about CORS headers.
-  var headers = defaultCorsHeaders;
+  
+  // headers['Content-Type'] = 'application/javascript';
 
-  // Tell the client we are sending them plain text.
-  //
-  // You will need to change this if you are sending something
-  // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'application/javascript';
+  // // .writeHead() writes to the request line and headers of the response,
+  // // which includes the status and all headers.
+  // response.writeHead(statusCode, headers);
 
-  // .writeHead() writes to the request line and headers of the response,
-  // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
-
-  // Make sure to always call response.end() - Node may not send
-  // anything back to the client until you do. The string you pass to
-  // response.end() will be the body of the response - i.e. what shows
-  // up in the browser.
-  //
-  // Calling .end "flushes" the response's internal buffer, forcing
-  // node to actually send all the data over to the client.
-  response.end(JSON.stringify(results));
+  
+  // response.end(JSON.stringify(dataBAse));
 };
 
 
