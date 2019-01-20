@@ -38,7 +38,7 @@ var requestHandler = function(request, response) {
     console.log('OPTIONS SUCCESS');
     var statusCode = 200;
     var headers = defaultCorsHeaders;
-    response.writeHead(200, headers);
+    response.writeHead(statusCode, headers);
     response.end('great..ended');    
   }
   //Notes:
