@@ -34,24 +34,31 @@ var dataBAse = {
 };
 var requestHandler = function(request, response) {
 //console.log(request)
-
+  if (request.method === 'OPTIONS') {
+    console.log('OPTIONS SUCCESS');
+    var statusCode = 200;
+    var headers = defaultCorsHeaders;
+    response.writeHead(200, headers);
+    response.end('great..ended');    
+  }
   //Notes:
-
+  console.log(request.method, request.url);
   // if this is a Get request 
-  if (request.method === 'GET') { //for Get request
+  if (request.method === 'GET' ) { //for Get request
     if (request.url === '/classes/messages') { //for Get request
       // if it is succesful request 
       // return a 200 
       console.log('Serving request type ' + request.method + ' for url ' + request.url);
       var statusCode = 200;
       var headers = defaultCorsHeaders;
-      headers['Content-Type'] = 'application/javascript';
+      headers['Content-Type'] = 'application/json';
       
       response.writeHead(statusCode, headers);
 
       response.end(JSON.stringify(dataBAse));
       
     } else {
+      // console.log('Im here.')
       var statusCode = 404;
       var headers = defaultCorsHeaders;
       headers['Content-Type'] = 'application/javascript';
@@ -78,7 +85,7 @@ var requestHandler = function(request, response) {
       }).on('end', () => {
         body = Buffer.concat(body).toString();
         dataBAse.results.push(JSON.parse(body));
-        console.log('good job');
+        console.log(dataBAse.results);
       });
 
 
